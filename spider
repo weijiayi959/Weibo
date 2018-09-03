@@ -5,13 +5,13 @@ import json
 from pyquery import PyQuery as pq
 import pymongo
 
-client=pymongo.MongoClient(host='localhost',port=27017)
-db=client.weibo1
-collection=db.weibo1
+client = pymongo.MongoClient(host='localhost', port=27017)
+db = client.weibo1
+collection = db.weibo1
 
 
-headers={'Referer': 'https://m.weibo.cn/u/2830678474?display=0&retcode=6102',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.75 Safari/537.36',
+headers={'Referer':'https://m.weibo.cn/u/2830678474?display=0&retcode=6102',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.75 Safari/537.36',
         'X-Requested-With':'XMLHttpRequest',
         'Cookie':'ALF=1535040584;T_WM=294aeb62d72ba9c8eb82c977303246c7; WEIBOCN_FROM=1110006030; MLOGIN=0; M_WEIBOCN_PARAMS=luicode%3D10000011%26lfid%3D1076032830678474%26fid%3D1005052830678474%26uicode%3D10000011',
         'Host':'m.weibo.cn'
@@ -19,33 +19,33 @@ headers={'Referer': 'https://m.weibo.cn/u/2830678474?display=0&retcode=6102',
 
 def get_page(page):
     try:
-        params={
+        params = {
             'display':'0',
             'retcode':'6102',
             'type':'uid',
-            'value': '2830678474',
-            'containerid': '1076032830678474',
+            'value':'2830678474',
+            'containerid':'1076032830678474',
             'page':page
         }
         url = 'https://m.weibo.cn/api/container/getIndex?'
-        response=requests.get(url+urlencode(params),headers=headers)
-        if response.status_code==200:
+        response = requests.get(url+urlencode(params), headers=headers)
+        if response.status_code == 200:
             return response.json()          
     except RequestException:
         return None
 
 def parse_page(json):
     if json:
-        items=json['data']['cards']
+        items = json['data']['cards']
         for item in items:
             try:
-                mblog=item['mblog']
-                text=pq(mblog['text']).text()
-                id=mblog['id']
-                time=mblog['created_at']
-                attitudes=mblog['attitudes_count']
-                comments=mblog['comments_count']
-                content=mblog['content_auth']
+                mblog = item['mblog']
+                text= pq(mblog['text']).text()
+                id = mblog['id']
+                time = mblog['created_at']
+                attitudes = mblog['attitudes_count']
+                comments = mblog['comments_count']
+                content = mblog['content_auth']
                 yield{
                     'text':text,
                     'id':id,
@@ -71,6 +71,6 @@ def main(page):
         print(item)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     for page in range(0,11):
         main(page)
